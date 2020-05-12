@@ -12,20 +12,31 @@ const outputPath = path.join(OUTPUT_DIR, "team.html");
 
 
 let newEmployee = [];
-
+let employee = '';
 question();
 
 async function question(){
-await inquirer.prompt([
+ inquirer.prompt([
     {
     type: "list", 
     name: "role",
     message: "Position of employment",
-    choices: ["Manager", "Engineer", "Intern"],
+    choices: ["Manager", "Engineer", "Intern"]
     }
-]).then(response => {
-    if(response.role === "Manager"){
-        manPrompt()
+]).then(await function(response) {
+    console.log(response)
+    switch(response.role) {
+        case 'Manager': manPrompt();
+        break;
+        case 'Engineer':  engPrompt();
+        break;
+        case 'Intern': intPrompt();
+        break;
+        default: break;
+    }
+
+});
+}        
         async function manPrompt(){
         await inquirer.prompt([
             {
@@ -45,26 +56,18 @@ await inquirer.prompt([
             },
             {
                 type: "input",
-                name:"OfficeNumber",
+                name:"officeNumber",
                 message:"enter office number"
-            },
-            {
-                type: "list",
-                name: "new employee",
-                message: "would you like to input a new employee",
-                choices:["yes","no"]
             }
-
         ]).then( answers => {
-            let man = new Manager(answers.name,answers.id,answers.email,answers.OfficeNumber,response.role);
-            newEmployee.push(man)
+            let man =  new Manager(answers.name,answers.id,answers.email,answers.officeNumber);
+            newEmployee.push(man);
             console.log(man);
-            
         })
+        askQuestion();
     }
-}
-    else if(response.role === "Engineer"){
-        inquirer.prompt ([
+    async function engPrompt(){
+        await inquirer.prompt ([
             {
                 type: "input",
                 name: "name",
@@ -82,18 +85,18 @@ await inquirer.prompt([
             },
             {
                 type: "input",
-                name:"GitHub",
+                name:"gitHub",
                 message:"enter GitHub name"
             }
         ]).then( answers => {
-            let eng = new Engineer(answers.name,answers.id,answers.email);
+            let eng = new Engineer(answers.name,answers.id,answers.email,answers.gitHub);
             newEmployee.push(eng)
             console.log(eng);
-        } 
-        )
+        })
+        askQuestion()
     }
-    else if(response.role === "Intern"){
-        inquirer.prompt ([
+    async function intPrompt(){
+        await inquirer.prompt ([
             {
                 type: "input",
                 name: "name",
@@ -111,49 +114,44 @@ await inquirer.prompt([
             },
             {
                 type: "input",
-                name:"School",
+                name:"school",
                 message:"enter student's university"
             }
         ]).then( answers => {
-            let int = new Intern(answers.name,answers.id,answers.email,answers.School);
+            let int = new Intern(answers.name,answers.id,answers.email,answers.school);
             newEmployee.push(int)
             console.log(int);
         })
+        askQuestion()
+        
+    }
+    // await askQuestion();
+    async function askQuestion(){
+        await inquirer.prompt([
+             {
+                type: "list",
+                name: "newerEmployee",
+                message: "would you like to input a new employee",
+                choices:["true", "false"]
+            }
+        ]).then( answers => {
+            console.log(newEmployee)
+            let {newerEmployee} = answers
+            if(newerEmployee === "true"){
+                 question();
+            }else if(newerEmployee === "false"){
+                console.log(render(newEmployee))
+                fs.writeFile(outputPath, render(newEmployee), err =>{
+                    if(err){
+                        console.log(err);
+                        throw err
+                    }
+                    console.log("success")
+        
+                })
+                
+            }
+        })
     }
     
-            fs.writeFile(outputPath,render(newEmployee), err =>{
-                if(err){
-                    console.log(err);
-                    throw err
-                }
-                console.log("success")
-    
-            })
-             promptEmployee();
-}
-
-)};
-
-
-
-
-async function promptEmployee() {
-   await inquirer.prompt([{
-        type: "list",
-        name: "new employee",
-        message: "would you like to input a new employee",
-        choices:["yes","no"]
-    
-    }]).then(res => {
-        if(res.choices === "yes"){
-            question();
-            } else {
-                console.log("no new employee");
-            }
-
-    });
-}
-
-    //     }
-    
-
+            
