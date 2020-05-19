@@ -12,7 +12,6 @@ const outputPath = path.join(OUTPUT_DIR, "team.html");
 
 
 let newEmployee = [];
-let employee = '';
 question();
 
 async function question(){
@@ -140,7 +139,6 @@ async function question(){
             if(newerEmployee === "true"){
                  question();
             }else if(newerEmployee === "false"){
-                console.log(render(newEmployee))
                 fs.writeFile(outputPath, render(newEmployee), err =>{
                     if(err){
                         console.log(err);
@@ -154,4 +152,3 @@ async function question(){
         })
     }
     
-            
